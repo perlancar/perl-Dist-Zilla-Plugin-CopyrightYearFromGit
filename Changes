@@ -1,3 +1,8 @@
+0.002   2017-02-09 (PERLANCAR)
+
+	- [refactor] Use Release::Git::Util to remove code duplication.
+
+
 0.001    2017-02-04 (PERLANCAR)
 
          - First release.
