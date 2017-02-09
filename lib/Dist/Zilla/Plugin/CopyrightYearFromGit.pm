@@ -13,19 +13,20 @@ with (
 );
 
 sub before_build {
+    require Release::Util::Git;
     my $self = shift;
 
-    -d ".git" or $self->log_fatal(["No .git subdirectory found"]);
+    my $res = Release::Util::Git::list_git_release_tags(detail => 1);
+    $self->log_fatal(["%s - %s"], $res->[0], $res->[1]) unless $res->[0] == 200;
 
     my %years;
 
     # current date's year
     $years{ (localtime)[5]+1900 }++;
 
-    for my $line (`git for-each-ref --format='%(creatordate:raw) %(refname)' refs/tags`) {
-        my ($epoch, $offset, $tag) = $line =~ m!^(\d+) ([+-]\d+) refs/tags/(.+)! or next;
-        $tag =~ /^(version|ver|v)?\d/ or next;
-        $years{ (localtime $epoch)[5]+1900 }++; # XXX take offset into account
+    for my $e (@{ $res->[2] }) {
+        # year from each release tag
+        $years{ (localtime $e->{date})[5]+1900 }++; # XXX take tz_offset into account
     }
 
     my $year = join(", ", sort {$b <=> $a} keys %years);
