@@ -1,6 +1,15 @@
+0.003   2017-02-10 (PERLANCAR)
+
+	- No functional changes.
+
+        - [refactor] Use list_git_release_years() from Release::Git::Util 0.004.
+
+
 0.002   2017-02-09 (PERLANCAR)
 
-	- [refactor] Use Release::Git::Util to remove code duplication.
+	- No functional changes.
+
+        - [refactor] Use Release::Git::Util to remove code duplication.
 
 
 0.001    2017-02-04 (PERLANCAR)
