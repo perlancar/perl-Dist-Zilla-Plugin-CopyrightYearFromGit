@@ -16,20 +16,15 @@ sub before_build {
     require Release::Util::Git;
     my $self = shift;
 
-    my $res = Release::Util::Git::list_git_release_tags(detail => 1);
+    my $res = Release::Util::Git::list_git_release_years();
     $self->log_fatal(["%s - %s"], $res->[0], $res->[1]) unless $res->[0] == 200;
 
-    my %years;
-
-    # current date's year
-    $years{ (localtime)[5]+1900 }++;
-
-    for my $e (@{ $res->[2] }) {
-        # year from each release tag
-        $years{ (localtime $e->{date})[5]+1900 }++; # XXX take tz_offset into account
+    my $cur_year = (localtime)[5]+1900;
+    my @years = @{ $res->[2] };
+    if (!@years || $years[0] < $cur_year) {
+        unshift @years, $cur_year;
     }
-
-    my $year = join(", ", sort {$b <=> $a} keys %years);
+    my $year = join(", ", sort {$b <=> $a} @years);
     $self->log(["Setting copyright_year to %s", $year]);
 
     # dirty, dirty hack
