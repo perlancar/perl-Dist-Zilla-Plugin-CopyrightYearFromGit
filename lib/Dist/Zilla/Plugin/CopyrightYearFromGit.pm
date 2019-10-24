@@ -12,17 +12,25 @@ with (
     'Dist::Zilla::Role::BeforeBuild',
 );
 
-has min_year => (is => 'rw');
-has regex    => (is => 'rw');
+has min_year           => (is => 'rw');
+has release_tag_regex  => (is => 'rw');
+has author_name_regex  => (is => 'rw');
+has author_email_regex => (is => 'rw');
+
+sub mvp_aliases { return { regex => 'release_tag_regex' } }
 
 sub before_build {
     require Release::Util::Git;
     my $self = shift;
 
     my @lgry_args;
-    if (defined $self->regex) {
-        @lgry_args = ( regex => $self->regex );
-    }
+    push @lgry_args defined $self->release_tag_regex ?
+        (release_tag_regex => $self->release_tag_regex) : ();
+    push @lgry_args defined $self->author_name_regex ?
+        (author_name_regex => $self->author_name_regex) : ();
+    push @lgry_args defined $self->author_email_regex ?
+        (author_email_regex => $self->author_email_regex) : ();
+
     my $res = Release::Util::Git::list_git_release_years(@lgry_args);
     $self->log_fatal(["%s - %s"], $res->[0], $res->[1]) unless $res->[0] == 200;
 
@@ -79,8 +87,19 @@ Instruct the plugin to not include years below this year. Note that the current
 year will always be used, even though C<min_year> is (incorrectly) set to a
 value larger than the current year.
 
-=head2 regex
+=head2 release_tag_regex
 
-Specify a custom regular expression for matching version strings in git tags.
+Specify a custom regular expression for matching git release tags.
+
+An old alias C<regex> is still recognized, but deprecated.
+
+=head2 author_name_regex
+
+Only consider release commits where author name matches this regex.
+
+=head2 author_email_regex
+
+Only consider release commits where author email matches this regex.
+
 
 =head1 SEE ALSO
