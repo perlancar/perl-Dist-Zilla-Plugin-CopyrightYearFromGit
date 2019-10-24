@@ -24,11 +24,11 @@ sub before_build {
     my $self = shift;
 
     my @lgry_args;
-    push @lgry_args defined $self->release_tag_regex ?
+    push @lgry_args, defined $self->release_tag_regex ?
         (release_tag_regex => $self->release_tag_regex) : ();
-    push @lgry_args defined $self->author_name_regex ?
+    push @lgry_args, defined $self->author_name_regex ?
         (author_name_regex => $self->author_name_regex) : ();
-    push @lgry_args defined $self->author_email_regex ?
+    push @lgry_args, defined $self->author_email_regex ?
         (author_email_regex => $self->author_email_regex) : ();
 
     my $res = Release::Util::Git::list_git_release_years(@lgry_args);
