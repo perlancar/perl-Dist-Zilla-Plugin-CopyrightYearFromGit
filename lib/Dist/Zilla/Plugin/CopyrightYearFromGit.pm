@@ -13,12 +13,17 @@ with (
 );
 
 has min_year => (is => 'rw');
+has regex    => (is => 'rw');
 
 sub before_build {
     require Release::Util::Git;
     my $self = shift;
 
-    my $res = Release::Util::Git::list_git_release_years();
+    my @regex_args;
+    if (defined $self->regex) {
+        @regex_args = ( regex => $self->regex );
+    }
+    my $res = Release::Util::Git::list_git_release_years(@regex_args);
     $self->log_fatal(["%s - %s"], $res->[0], $res->[1]) unless $res->[0] == 200;
 
     my $cur_year = (localtime)[5]+1900;
@@ -73,5 +78,9 @@ books, where the year of each revision/edition is mentioned, e.g.:
 Instruct the plugin to not include years below this year. Note that the current
 year will always be used, even though C<min_year> is (incorrectly) set to a
 value larger than the current year.
+
+=head2 regex
+
+Specify a custom regular expression for matching version strings in git tags.
 
 =head1 SEE ALSO
