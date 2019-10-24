@@ -1,3 +1,8 @@
+0.005   2019-10-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add configuration: regex (thanks Stephen Thirlwall).
+
+
 0.004   2019-10-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Add configuration: min_year.
