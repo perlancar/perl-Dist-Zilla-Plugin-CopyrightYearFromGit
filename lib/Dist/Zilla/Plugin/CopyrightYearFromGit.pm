@@ -19,11 +19,11 @@ sub before_build {
     require Release::Util::Git;
     my $self = shift;
 
-    my @regex_args;
+    my @lgry_args;
     if (defined $self->regex) {
-        @regex_args = ( regex => $self->regex );
+        @lgry_args = ( regex => $self->regex );
     }
-    my $res = Release::Util::Git::list_git_release_years(@regex_args);
+    my $res = Release::Util::Git::list_git_release_years(@lgry_args);
     $self->log_fatal(["%s - %s"], $res->[0], $res->[1]) unless $res->[0] == 200;
 
     my $cur_year = (localtime)[5]+1900;
