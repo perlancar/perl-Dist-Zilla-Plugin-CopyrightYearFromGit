@@ -112,7 +112,7 @@ In F<dist.ini>:
  ; exclude_year = 2016
  ; exclude_year = 2017       ; optional, setting this two lines would make copyright_year become: 2021, 2019
 
- ; continuous_year = 1       ; optional, setting this two lines would make copyright_year become: 2021, 2020, 2019, 2018, 2017, 2016
+ ; continuous_year = 1       ; optional, setting this would make copyright_year become: 2021, 2020, 2019, 2018, 2017, 2016
 
 
 =head1 DESCRIPTION
