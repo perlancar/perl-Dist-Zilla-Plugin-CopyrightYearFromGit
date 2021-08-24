@@ -4,6 +4,8 @@ use 5.010001;
 use strict;
 use warnings;
 
+use List::Util ();
+
 use Moose;
 with (
     'Dist::Zilla::Role::BeforeBuild',
@@ -18,8 +20,13 @@ has min_year           => (is => 'rw');
 has release_tag_regex  => (is => 'rw');
 has author_name_regex  => (is => 'rw');
 has author_email_regex => (is => 'rw');
+has exclude_year       => (is => 'rw');
+has include_year       => (is => 'rw');
+has continuous_year    => (is => 'rw');
 
 sub mvp_aliases { return { regex => 'release_tag_regex' } }
+
+sub mvp_multivalue_args { qw(exclude_year include_year) }
 
 sub before_build {
     require Release::Util::Git;
@@ -45,7 +52,30 @@ sub before_build {
     if (!@years || $years[0] < $cur_year) {
         unshift @years, $cur_year;
     }
+
+    # filter by min_year
     @years = grep { !defined($min_year) || $_ >= $min_year } @years;
+
+    # add include_year
+    push @years, @{ $self->include_year } if $self->include_year;
+
+    # filter by exclude_year
+    if ($self->exclude_year) {
+        my @fyears;
+        for my $year (@years) {
+            next if grep { $year eq $_ } @{ $self->exclude_year };
+            push @years, $year;
+        }
+        @years = @fyears;
+    }
+
+    # make the years continuous
+    if ($self->continuous_year) {
+        my $min = List::Util::min(@years);
+        my $max = List::Util::max(@years);
+        @years = $min .. $max;
+    }
+
     my $year = join(", ", sort {$b <=> $a} @years);
     $self->log(["Setting copyright_year to %s", $year]);
 
@@ -73,10 +103,16 @@ This plugin will set copyright year to something like:
 
  2017, 2015, 2014, 2013
 
-where the years will be retrieved from 1) the date of git tags that resemble
-version string (qr/^(version|ver|v)?\d/); 2) current date; and will be listed in
-descending order in a comma-separated list. This format is commonly used in
-books, where the year of each revision/edition is mentioned, e.g.:
+where the years will be retrieved from: 1) the date of git tags that resemble
+version string (qr/^(version|ver|v)?\d/); 2) the current year. Years that do not
+see version tags and are not the current year will not be included, unless you
+set L</continuous_year> or L</include_year>. On the other hand, years that see
+version tags or the current year can be excluded via L</min_year> or
+L</exclude_year>.
+
+The included years will be listed in descending order in a comma-separated list.
+This format is commonly used in books, where the year of each revision/edition
+is mentioned, e.g.:
 
  Copyright (c) 2013, 2010, 2008, 2006 by Pearson Education, Inc.
 
@@ -85,23 +121,42 @@ books, where the year of each revision/edition is mentioned, e.g.:
 
 =head2 min_year
 
-Instruct the plugin to not include years below this year. If C<min_year> is
-(incorrectly) set to a value larger than the current year, then the current year
-will be used instead.
+Integer. Instruct the plugin to not include years below this year. If
+C<min_year> is (incorrectly) set to a value larger than the current year, then
+the current year will be used instead. Note that L</include_year> and
+L</exclude_year> override C<min_year>.
 
 =head2 release_tag_regex
 
-Specify a custom regular expression for matching git release tags.
+String (regex pattern). Specify a custom regular expression for matching git
+release tags.
 
 An old alias C<regex> is still recognized, but deprecated.
 
 =head2 author_name_regex
 
-Only consider release commits where author name matches this regex.
+String (regex pattern). Only consider release commits where author name matches
+this regex.
 
 =head2 author_email_regex
 
-Only consider release commits where author email matches this regex.
+String (regex pattern). Only consider release commits where author email matches
+this regex.
+
+=head2 include_year
+
+Integer (can be specified multiple times). Force-include one or more years. Note
+that L</exclude_year> overrides C<include_year>.
+
+=head2 exclude_year
+
+Integer (can be specified multiple times). Force-exclude one or more years. Note
+that L</continuous_year> overrides C<exclude_year>.
+
+=head2 continuous_year
+
+Boolean. If set to true, will make copyright_year a continuous range from the
+smallest included year to the largest included year, with no gap inside.
 
 
 =head1 SEE ALSO
