@@ -102,7 +102,7 @@ In F<dist.ini>:
  [CopyrightYearFromGit]
  ; release_tag_regex = ^v    ; optional, default is ^(version|ver|v)\d
  ; author_name_regex = foo   ; optional, default is none (any author name will be included)
- ; author_email_regex = foo  ; optional, default is none (any author name will be included)
+ ; author_email_regex = foo  ; optional, default is none (any author email will be included)
 
  ; min_year = 2017           ; optional, setting this would make copyright_year become: 2021, 2019, 2017.
 
