@@ -1,8 +1,5 @@
 package Dist::Zilla::Plugin::CopyrightYearFromGit;
 
-# DATE
-# VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -11,6 +8,11 @@ use Moose;
 with (
     'Dist::Zilla::Role::BeforeBuild',
 );
+
+# AUTHORITY
+# DATE
+# DIST
+# VERSION
 
 has min_year           => (is => 'rw');
 has release_tag_regex  => (is => 'rw');
@@ -83,9 +85,9 @@ books, where the year of each revision/edition is mentioned, e.g.:
 
 =head2 min_year
 
-Instruct the plugin to not include years below this year. Note that the current
-year will always be used, even though C<min_year> is (incorrectly) set to a
-value larger than the current year.
+Instruct the plugin to not include years below this year. If C<min_year> is
+(incorrectly) set to a value larger than the current year, then the current year
+will be used instead.
 
 =head2 release_tag_regex
 
