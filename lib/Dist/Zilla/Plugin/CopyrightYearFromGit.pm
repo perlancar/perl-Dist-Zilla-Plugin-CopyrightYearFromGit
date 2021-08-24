@@ -92,16 +92,34 @@ __PACKAGE__->meta->make_immutable;
 
 =head1 SYNOPSIS
 
+Suppose the current year is 2021 and you have release git tags for 2019, 2017,
+2016. The default setting will make copyright_year to be:
+
+ 2021, 2019, 2017, 2016
+
 In F<dist.ini>:
 
  [CopyrightYearFromGit]
+ ; release_tag_regex = ^v    ; optional, default is ^(version|ver|v)\d
+ ; author_name_regex = foo   ; optional, default is none (any author name will be included)
+ ; author_email_regex = foo  ; optional, default is none (any author name will be included)
+
+ ; min_year = 2017           ; optional, setting this would make copyright_year become: 2021, 2019, 2017.
+
+ ; include_year = 2015
+ ; include_year = 2013       ; optional, setting this two lines would make copyright_year become: 2021, 2019, 2017, 2016, 2015, 2013.
+
+ ; exclude_year = 2016
+ ; exclude_year = 2017       ; optional, setting this two lines would make copyright_year become: 2021, 2019
+
+ ; continuous_year = 1       ; optional, setting this two lines would make copyright_year become: 2021, 2020, 2019, 2018, 2017, 2016
 
 
 =head1 DESCRIPTION
 
-This plugin will set copyright year to something like:
+This plugin will set copyright_year to something like:
 
- 2017, 2015, 2014, 2013
+ 2021, 2019, 2017, 2016
 
 where the years will be retrieved from: 1) the date of git tags that resemble
 version string (qr/^(version|ver|v)?\d/); 2) the current year. Years that do not
@@ -119,13 +137,6 @@ is mentioned, e.g.:
 
 =head1 CONFIGURATION
 
-=head2 min_year
-
-Integer. Instruct the plugin to not include years below this year. If
-C<min_year> is (incorrectly) set to a value larger than the current year, then
-the current year will be used instead. Note that L</include_year> and
-L</exclude_year> override C<min_year>.
-
 =head2 release_tag_regex
 
 String (regex pattern). Specify a custom regular expression for matching git
@@ -142,6 +153,13 @@ this regex.
 
 String (regex pattern). Only consider release commits where author email matches
 this regex.
+
+=head2 min_year
+
+Integer. Instruct the plugin to not include years below this year. If
+C<min_year> is (incorrectly) set to a value larger than the current year, then
+the current year will be used instead. Note that L</include_year> and
+L</exclude_year> override C<min_year>.
 
 =head2 include_year
 
